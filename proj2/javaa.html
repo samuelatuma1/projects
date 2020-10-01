@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <script>
+            document.addEventListener('DOMContentLoaded', function(){
+                user = document.querySelector('#a').dataset.value
+
+                document.querySelectorAll('div').forEach(function(div){
+                    if(div.className == user){
+                        div.style.backgroundColor='pink';
+                        div.style.float = 'right';
+                    
+                        div.style.width = '30%';
+                        div.style.borderRadius= '10px'
+                        //div.style.clear = 'both';
+
+                        
+                        button = document.createElement('button')
+                        button.className = 'deleteButton'
+                        button.innerHTML = 'Delete'
+                        button.style.backgroundColor = 'pink';
+
+                        div.append(button)
+
+                    }
+                    else if(div.className=='all'){
+                        div.style.backgroundColor='white';
+                       
+                    }
+                    else{
+                        div.style.backgroundColor='yellow';
+                        div.style.width = '30%';
+                        div.style.borderRadius= '10px'
+                    }
+                })
+
+                   document.querySelectorAll('.deleteButton').forEach(function(button){
+                        button.onclick = function(){
+                        post = this.parentElement
+                        user = post.getAttribute('data-name')
+                        
+                        
+                                              
+                        document.querySelector('body').innerHTML = user
+                         }
+                    })        
+                    adds = 2 + parseInt('2')
+
+                alert(adds)
+                
+            })
+        </script>
+    </head>
+
+    <body>
+        <div id='a' data-value='a'>a</div>
+       <div class='all'>
+           <div class='a' data-name='mumu'>aarr</div><br>
+           
+           <div class='b'>aarr</div><br>
+           <div class='b'>aarrf dygbfhgf vhbbj ffbfb</div><br>
+           <div class='a'data-name='mumu' >aarffrr bbbr</div><br>
+           
+       </div>
+       <p data-name='pink' data-names='green'>five</p>
+       <button>Submit</button>
+
+       
+    </body>
+</html>

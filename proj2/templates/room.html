@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{room.createChat}}</title>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function(){
+
+                
+                
+                user = document.querySelector('#username').dataset.value
+
+                document.querySelectorAll('div').forEach(function(div){
+                    if(div.className==user){
+                        div.style.backgroundColor='pink'
+                        div.style.float = 'right';
+                        
+                    
+                        div.style.width = '60%';
+                        div.style.borderRadius= '5px';
+
+                        div.style.padding = '0.2%'
+                        div.style.clear = 'both';
+
+                        button = document.createElement('button')
+                        button.className = 'deleteButton'
+                        button.innerHTML = 'Delete'
+                        button.style.backgroundColor = 'pink';
+
+                        div.append(button)
+                    }
+
+                    else if(div.className=='all'){
+                        div.style.backgroundColor='white';
+                    }
+
+               
+                    else{
+                        div.style.backgroundColor='rgb(185, 185, 243)';
+                        div.style.width='60%';
+                        div.style.borderRadius= '5px';
+                        div.style.clear = 'both'; 
+                    }
+                })
+
+
+                var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port)
+                socket.on('connect', function(){
+                    
+                    document.querySelector('#yourChat').onkeyup = function(e){
+                        if (e.keyCode == 13){
+                            document.querySelector('#submit').click();
+                        }
+                    }
+
+                    document.querySelector('#submit').onclick = function(){
+                        text = document.querySelector('#yourChat').value
+                        user = document.querySelector('#username').dataset.value
+                        createChat = document.querySelector('#createChat').dataset.group
+
+                        socket.emit('message', {'msg': text, 'user': user, 'createChat': createChat})
+                    }
+                    
+                    document.querySelectorAll('.deleteButton').forEach(function(button){
+                        button.onclick = function(){
+                        post = this.parentElement
+                        
+                        user = post.getAttribute('data-user')
+                        msg = post.getAttribute('data-msg')
+                        createChat = document.querySelector('#createChat').dataset.group
+                        
+                        socket.emit('deletePost', {'msg': msg, 'user': user, 'createChat': createChat})
+                         }
+                    })
+
+                    socket.on('sendMsg', function(data){
+
+                        room = data.room
+                        location.reload();
+                        
+                    })
+
+                    socket.on('deleteMsg', function(data){
+
+                        room = data.room
+                        location.reload();
+
+                        }
+                    )
+                })
+            })
+
+            
+        </script>
+
+        <style>
+                input{
+                border: 0.2px solid grey ;
+                border-radius:  20px;
+                width: 80%;
+                
+                }
+                button{
+                    background-color: blue;
+                    border-radius:  20px;
+                }
+
+        </style>
+
+
+    </head>
+
+
+    <body>
+
+        <div class='alone'>
+        <div id='username' data-value='{{user}}' ><strong>Username: {{user}}</strong></div>
+        <div id='createChat' data-group='{{ room.createChat }}'><strong>Group Story: {{ room.createChat }}</strong></div>
+    </div>
+    <hr>
+    <hr>
+    <br>
+
+        <div class='all'>
+            {% for msg in room.msg %}
+                <div class='{{msg.user}}' data-user='{{ msg.user }}' data-msg='{{ msg.msg }}'>
+                    <span><strong>{{msg.user}}</strong></span>
+                    <p>{{ msg.msg }}</p>
+                </div>
+            {% else %}
+                <p>No messages yet</p>
+            {% endfor %}
+
+        </div>
+
+        <input name='yourChat' id='yourChat' placeholder='message'>
+        <button id='submit'>Submit</button>
+    </body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Homepage</title>
+
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port)
+
+            socket.on('connect', function(){
+                document.querySelector('#chatCreate').onclick = function() {
+                createChat = document.querySelector('#createChat').value;
+                msg = [];
+                socket.emit('createRoom', {'createChat': createChat, 'msg': msg})
+                     }
+
+                socket.on('redirect', function(data){
+                    window.location=data.url;
+                })
+                })
+            })
+
+        </script>
+
+    </head>
+
+    <body>
+        <div>
+            <h3>Create a conversation</h3>
+            <h3>Start your story</h3>
+        </div>
+        
+        
+            <input type='text' placeholder='Create Chat Room' name='createChat' id='createChat'>
+            <button id='chatCreate'>Submit</button>
+        
+        
+     
+        <div>
+        <h3> Join a conversation</h3>
+        <h3>Contribute your story</h3>
+         </div>
+        <ul>{% for chat in chatRooms %}</ul>
+        <li><a href="{{ url_for('new_view', chats=chat.createChat) }}">{{ chat.createChat}}</a></li><br>
+        {% else %}
+        <li> No chatRoom yet</li>
+        {% endfor %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <style>
+    input{
+        border: 0.2px solid grey ;
+        border-radius:  20px;
+
+    }
+    button{
+        background-color: blue;
+        border-radius:  20px;
+    }
+
+    @media(min-width:700px){
+        body{
+            background-color: rgb(255, 251, 251);/*darkcyan*/
+        }
+        div{
+            background-color: pink;
+            width: 50%;
+            border-radius:  10px;
+            text-align: center;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+
+
+        }
+        
+        li{
+            background-color: rgb(155, 155, 245);
+            width: 45%;
+            border-radius:  10px;
+            text-align: center;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
+        a{
+            
+            
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            color: black;
+            text-decoration: none;
+        }
+    }
+
+        
+
+    @media(max-width:698px){
+        body{
+            background-color: rgb(255, 251, 251)/*darkcyan;*/
+        }
+        div{
+            background-color: pink;
+            width: 100%;
+            border-radius:  10px;
+            text-align: center;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+
+
+        }
+        
+        li{
+            background-color: rgb(187, 187, 239);
+            width: 100%;
+            border-radius:  10px;
+            text-align: center;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
+        a{
+            
+            
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            color: black;
+            text-decoration: none;
+        }
+    }
+</style>
+    </body>
+</html>
+

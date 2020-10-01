@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %} 
+<div>
+<h2>Already a member</h2>
+<h2>Flack, sign in <a href="{{url_for('login')}}">Here</a></h2>
+</div>
+<h2>Sign up</h2>
+<form action="{{url_for('adduser')}}" method='post'>
+    <input type='text' placeholder='Username' name='username'></br></br>
+    <input type='password' placeholder='password' name='password'></br></br>
+    <input type='password' placeholder='Re-enter Password' name='password2'></br></br>
+    <button>Submit</button>
+</form>
+
+
+<style>
+    div{
+        text-align: center;
+        color: rgb(80, 80, 80);
+        font-family: Arial, Helvetica, sans-serif;
+        border: 2px solid rgb(241, 240, 245);
+        background-color: rgb(130, 117, 186);
+        border: 0.2px solid grey ;
+                border-radius:  20px;
+
+    }
+    input{
+        border: 0.2px solid grey ;
+        border-radius:  20px;
+
+    }
+    button{
+        background-color: blue;
+        border-radius:  20px;
+    }
+    
+    @media(min-width:600px){
+        div{
+            width: 50%;
+        }
+        a{
+            
+            
+           
+            color: gainsboro;
+            text-decoration: none;
+        }
+    }
+
+    @media(max-width:500px){
+        div{
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            width:100%;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %} 
+<div>
+<h3>Not a registered user?</h3>
+<h3>sign up <a href="{{url_for('register')}}">Here</a></h3>
+</div>
+<h1>Sign in</h1>
+
+<form action="{{url_for('logsin')}}" method='post'>
+    <input type='text' placeholder='Username' name='username'></br></br>
+    <input type='password' placeholder='password' name='password'></br></br>
+    
+    <button>Submit</button>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    div{
+        text-align: center;
+        color: rgb(80, 80, 80);
+        font-family: Arial, Helvetica, sans-serif;
+        border: 2px solid rgb(241, 240, 245);
+        background-color: rgb(130, 117, 186);
+        border: 0.2px solid grey ;
+                border-radius:  20px;
+
+    }
+    input{
+        border: 0.2px solid grey ;
+        border-radius:  20px;
+
+    }
+    button{
+        background-color: blue;
+        border-radius:  20px;
+    }
+    
+    @media(min-width:600px){
+        div{
+            width: 50%;
+        }
+        a{
+            
+            
+           
+            color: gainsboro;
+            text-decoration: none;
+        }
+    }
+
+    @media(max-width:500px){
+        div{
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            width:100%;
+        }
+    }
+</style>
+{% endblock %}

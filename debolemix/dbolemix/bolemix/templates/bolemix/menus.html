@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tries</title>
+        <style>
+            body{
+                background-color: white;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            button{
+                background-color: palevioletred;
+                border-radius: 8px;
+            }
+            #enbody{
+                display: flex;
+                flex-wrap: wrap;
+
+            }
+            a{
+                text-decoration: none;
+                color: black;
+
+            }
+            image{
+                border-radius: 5px;
+            }
+
+            
+
+            @media(min-width: 805px){
+            #designI, #designII, #designIII{
+                
+                text-align: center;
+                border-radius: 15px;
+                width: 33%;
+                background-color: gray;
+                opacity: 0.9;
+                color: white;
+                margin: 20px;
+                
+            }
+            }
+
+            @media(max-width: 800px){
+            #designI, #designII, #designIII{
+                
+                text-align: center;
+                border-radius: 8px;
+                width: 100%;
+                background-color: white;
+                opacity: 0.9;
+                color: black;
+                margin: 20px;
+                border: 0.5px solid rgb(222, 220, 220);
+                
+            }
+            }
+            .routingTo{
+                float: right;
+                clear: both;
+            }
+            
+            td{
+                border-bottom: 2px solid rgb(157, 156, 156);
+                
+                
+            }
+           #menudesign{
+                
+                top: 0px;
+               background-color: rgb(179, 90, 90);
+               margin: auto;
+               height: 45px;
+               opacity: 1;
+               text-align: center;
+           }
+           .menudesign{
+                height: 45px;
+                /*margin and top force this element to the very top pf the parent element */
+                margin: auto;
+                top: 0px;
+               background-color: yellow;
+               
+               opacity: 1;
+               text-align: center;
+               
+           }
+            
+        
+
+
+           
+        </style>
+    </head>
+
+    <body>
+
+        <h3 class='routingTo'><span><a href='{% url "logoutView" %}'>Logout {{ user }}</a></span> | <span><a href='{% url "purchased" %}'>Cart</a></span> | <span><a href='{% url "requested" %}'>Purchases</a></span></h3>
+        <br>
+         
+        <br>
+        <h4>Hello {{ user }}</h4>
+        <div id='enbody'>
+        <div id='designI'>
+            <h3 class='menudesign'>Food Menu</h3>
+        <ul>
+
+            {% if total %}
+        
+                {% for food in total %}
+                    <li><a href='{% url "getmenu" food.0 %}'>{{ food.0 }}</a></li>
+                    <hr>
+                {% endfor %}
+            {% else %}
+            <li> No menu yet</li>
+            {% endif %}
+        </ul>
+     </div>
+
+
+     <div id='designII'>
+         <h3 id='menudesign'>Menu items</h3>
+            {% if foodItems %}
+                <table>
+                    <tr>
+                        <th>
+                            Food
+                        </th>
+                        <th>
+                            foodItem
+                        </th>
+                        <th>
+                            Description
+                        </th>
+                        <th>
+                            price
+                        </th>
+                        <th>
+                            add
+                        </th>
+                    </tr>
+
+
+                {% for foodItem in foodItems %}
+                <tr>
+                    <td style='width:30%'>
+                        {% if foodItem.img %}
+                        <img src='{{ foodItem.img.url }}' alt='{{ foodItem.name }}' style='width:100%'>
+                        {% else %}
+                        No image
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url 'getmenu' foodItem.name %}"></a>{{ foodItem.name }}</a></td>
+                    <td><a href="{% url 'getmenu' foodItem.name %}"></a> {{ foodItem.descr }}</a></td>
+                    <td><a href="{% url 'getmenu' foodItem.name %}"></a> {{ foodItem.price }}</a></td>
+                    <td><button class='addToCart' data-food='{{ foodItem.name }}' data-price='{{ foodItem.price }}'>Add</button></td>
+                    
+                    
+                </tr>
+                
+                {% endfor %}
+                </table>
+
+                {% else %}
+                <li>No menu yet</li>
+                {% endif %}
+                <p>{{ displayMsg }}</p>
+                <hr>
+                
+            </div>                
+            <br>
+            
+            <div id='designIII'>
+                <h3 class='menudesign'>Temporary cart</h3>
+                <ol id='cartItem'>
+
+                </ol>
+                <hr>
+                <div id='totals'></div>
+                <hr>
+                <button id='toCart'>toCart</button>
+                
+            </div>
+
+
+
+        </div>
+
+                
+    </body>
+
+            <script>
+                //
+
+                    //This gives the concept of changing images everytime the page is reloaded
+                    //This was used instead of css because with this, we can make the page more dynamic 
+
+                    //Alternate between a white background and picture background
+                    
+                    choice = Math.floor(Math.random() * 2)
+                    if(choice == 0){
+                        document.querySelector('body').style.backgroundColor = 'white'
+                    }
+                    else{
+                    val=Math.floor((Math.random() * 7)+1)
+                    document.querySelector('body').style.background = `url('/static/bolemix/img/dbole${val}.jpg')`;
+                    document.querySelector('body').style.backgroundSize = '100%';
+                }
+
+
+
+
+
+                    //Make the display cart invisible if nothing is on it
+                    if(sessionStorage.getItem('dbolebuys')){
+                        if (JSON.parse(sessionStorage.getItem('dbolebuys')).length < 1){
+                        document.querySelector('#designIII').style.display = 'none';
+                        }
+                        else{
+                            document.querySelector('#designIII').style.display = 'block'
+                        }
+                    }
+                    else{
+                        document.querySelector('#designIII').style.display = 'none';
+                    }
+                    
+                //
+                
+                if (sessionStorage.getItem('dbolebuys')){
+                    
+                    buys = JSON.parse(sessionStorage.getItem('dbolebuys'))
+                    
+                    //
+                    for(i=0; i<buys.length; i++){
+                        food = buys[i].food
+                        price = buys[i].price
+
+                        li = document.createElement('li')
+                        li.setAttribute('data-food', food)
+                        li.setAttribute('data-price', price)
+                        li.setAttribute('class', 'toBuy')
+                        button = document.createElement('button')
+
+                        button.setAttribute('class', 'removeItem')
+
+                        button.innerHTML = '-';
+
+     
+                        
+
+                        li.innerHTML = `${food} - ${price}`;
+                        li.append(button)
+
+                        button.onclick = function(){
+                            //make cart menu visible
+                            document.querySelector('#designIII').style.display = 'block'
+
+                            //tryout
+                            total=0
+                                for(i=0; i<buys.length; i++){
+                                    
+                                    prices = parseInt(buys[i].price)
+                                    total += prices;
+                                    
+                                }
+                                  document.querySelector("#totals").innerHTML =`Total ${total}`
+                             //end tryout
+
+
+
+
+
+                            food = this.parentElement.getAttribute('data-food')
+                            price = this.parentElement.getAttribute('data-price')
+                            this.parentElement.remove()
+                          
+
+                            
+
+                            for (i=0; i<buys.length; i++){
+                                if(buys[i].food==food && buys[i].price==price){
+                                    buys.splice(i, 1);
+
+                                    sessionStorage.setItem('dbolebuys', JSON.stringify(buys))
+
+                            //tryout
+                            total=0
+                                for(i=0; i<buys.length; i++){
+                                    
+                                    prices = parseInt(buys[i].price)
+                                    total += prices;
+                                    
+                                }
+                                document.querySelector("#totals").innerHTML = `Total ${total}`
+                            //end tryout
+                                    return;
+                                }
+                            
+                            }
+                                //
+                            sessionStorage.setItem('dbolebuys', JSON.stringify(buys))
+                            
+                           
+                            }
+
+                            
+                        
+        
+
+                        
+                        document.querySelector('#cartItem').append(li)
+
+                        sessionStorage.setItem('dbolebuys', JSON.stringify(buys))
+                        
+
+                        
+                      
+                        
+
+                        
+                    }
+
+                    
+                 
+                }
+                else{
+
+                    buys = []
+                }
+                 
+                //
+
+
+                 if (buys.length>0){
+                     let total = 0
+                                for(i=0; i<buys.length; i++){
+                                    
+                                    prices = parseInt(buys[i].price)
+                                    total += prices;
+                                    
+                                    }
+                                }
+                                else{
+                                    total = 0;
+                                }
+
+
+
+
+
+                document.querySelectorAll('.addToCart').forEach(function(button){
+                    button.onclick = function(){
+
+
+
+
+                          //Make the display cart invisible if nothing is on it
+                        document.querySelector('#designIII').style.display = 'block'
+
+                        
+                        food = this.getAttribute('data-food')
+                        price=this.getAttribute('data-price')
+
+                        li = document.createElement('li')
+                        li.setAttribute('data-food', food)
+                        li.setAttribute('data-price', price)
+                        li.setAttribute('class', 'toBuy')
+                        button = document.createElement('button')
+
+                        button.setAttribute('class', 'removeItem')
+
+                        button.innerHTML = '-';
+
+     
+                        
+
+                        li.innerHTML = `${food} - ${price}`;
+                        li.append(button)
+
+                        button.onclick = function(){
+
+
+
+                            //tryout
+                            total=0
+                                for(i=0; i<buys.length; i++){
+                                    
+                                    prices = parseInt(buys[i].price)
+                                    total += prices;
+                                    
+                                }
+                                  document.querySelector("#totals").innerHTML =`Total ${total}`
+                             //end tryout
+
+
+
+
+
+                            food = this.parentElement.getAttribute('data-food')
+                            price = this.parentElement.getAttribute('data-price')
+                            this.parentElement.remove()
+
+                            for (i=0; i<buys.length; i++){
+                                if(buys[i].food==food && buys[i].price==price){
+                                    buys.splice(i, 1);
+
+                                    sessionStorage.setItem('dbolebuys', JSON.stringify(buys))
+                                    
+                            //tryout
+                            total=0
+                                for(i=0; i<buys.length; i++){
+                                    
+                                    prices = parseInt(buys[i].price)
+                                    total += prices;
+                                    
+                                }
+                                document.querySelector("#totals").innerHTML = `Total ${total}`
+                            //end tryout
+                                    return;
+                                }
+                            
+                            }
+                                     
+                                //
+                            sessionStorage.setItem('dbolebuys', JSON.stringify(buys))
+                           
+                            }
+                        
+        
+
+                        
+                        document.querySelector('#cartItem').append(li)
+                        
+
+                            
+                        newBuy = {"food": food, "price": price} 
+                        buys.push(newBuy)
+
+                            //
+                        sessionStorage.setItem('dbolebuys', JSON.stringify(buys))
+                        
+                 //tryout
+                                  total=0
+                                if (buys.length>0){
+                                for(i=0; i<buys.length; i++){
+                                    
+                                    prices = parseInt(buys[i].price)
+                                    total += prices;
+                                    
+                                    }
+                                }
+                                else{
+                                      
+                                    total = 0;
+                                    
+                                }
+
+                                //
+                             
+                                //
+
+
+                                document.querySelector("#totals").innerHTML = `Total: $${total}`
+                                
+                //end tryout
+                
+
+                    }
+                })
+                  //Make the display cart invisible if nothing is on it
+                  
+              
+                     document.querySelector('#toCart').style.display = 'block';
+                
+
+                
+
+                //onclick of the toCart button, take the                 
+                document.querySelector('#toCart').onclick = function(){
+
+                    sessionStorage.setItem('dbolebuys', '[]')
+
+                let buy = buys
+                
+                let dataForm = new FormData();
+                dataForm.append('buys', JSON.stringify(buy))
+
+                    //
+                    
+
+                //
+                total=0
+                                if (buys.length>0){
+                                for(i=0; i<buys.length; i++){
+                                    
+                                    prices = parseInt(buys[i].price)
+                                    total += prices;
+                                    
+                                    }
+                                }
+                                else{
+                                    total = 0;
+                                }
+                
+                dataForm.append('total', JSON.stringify(total))
+                /*
+                console.log(Array.from(dataForm))
+                for (let obj of dataForm){
+                    console.log(obj)
+                }
+                */
+                dataForm.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                if(total != 0){
+                const request = new XMLHttpRequest()
+                request.open('POST', '{% url "cart" %}')
+               
+
+                request.onload = function(){
+                const data = JSON.parse(request.responseText)
+                
+                ///On return of request, Redirect to cart url
+                // Please, change as soon as you write function for purchased from menu to purchased
+               window.location.assign('{% url "purchased" %}')
+               
+            }
+            
+            request.send(dataForm)
+           
+
+
+            }
+            else{
+                alert('nothing on cart')
+            }
+                }
+            </script>
+    </body>
+</html>
+

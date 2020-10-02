@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Choose Display message</title>
+
+        <style>
+            button{
+                background-color: palevioletred;
+                border-radius: 8px;
+            }
+            body{
+                /*display: flex;
+                flex-wrap: wrap; 
+                */
+                background-color: yellow;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+           
+            textarea{
+                border-radius: 20px;
+                opacity: 0.7;
+
+            }
+            h2{
+                text-align: center;
+            }
+            form{
+                text-align: center;
+            }
+
+    </style>
+    </head>
+
+    <body>
+        <h3><span><a href='{% url "adminDetails" %}'>To admin Purchases</a></span></h3>
+        {% if displayMsg %}
+            
+            <h2>Current Display: {{ displayMsg }}</h2>
+
+            {% endif %}
+        <form action="{% url 'displaymsg' %}" method="POST">
+            {% csrf_token %}
+            <textarea name='msgToDisplay' placeholder="Type message to be displayed on all user's page" rows='5' cols='20'></textarea>
+            <br>
+            <button>Submit</button>
+            
+        </form>
+
+
+        <script>
+             //This gives the concept of changing images everytime the page is reloaded
+            //This was used instead of css because with this, we can make the page more dynamic 
+            val=Math.floor((Math.random() * 7)+1)
+            document.querySelector('body').style.background = `url('/static/bolemix/img/dbole${val}.jpg')`;
+            document.querySelector('body').style.backgroundSize = '100%';
+            
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Admin account section</title>
+
+
+        <style>
+            button{
+                background-color: palevioletred;
+                border-radius: 8px;
+                opacity: 0.7;
+            }
+            body{
+                /*display: flex;
+                flex-wrap: wrap; 
+                */
+                background-color: pink;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            input{
+                border-radius: 15px;
+                opacity: 0.8;
+            }
+            textarea{
+                border-radius: 20px;
+                opacity: 0.7;
+
+            }
+
+            @media(min-width: 805px){
+            div{
+                
+                text-align: center;
+                border-radius: 15px;
+                width: 80%;
+                background-color: gray;
+                opacity: 0.8;
+                color: white;
+                margin: 50px;
+                
+            }
+            }
+
+            @media(max-width: 800px){
+            div{
+                
+                text-align: center;
+                border-radius: 15px;
+                width: 80%;
+                background-color: gray;
+                opacity: 0.8;
+                color: white;
+                margin: 20px;
+                
+            }
+            }
+          
+           
+        </style>
+    </head>
+
+    <body>
+        <h3><span><a href='{% url "displaymsg" %}'>To Display Message</a></span></h3>
+        <button id='pending'>pending Purchases</button>
+        <button id='received'>Received Purchases</button>
+        <button id='delivered'>Delivered Purchases</button>
+        <hr>
+
+        <div id='purchaseDetails'>
+            <ul id='purchaseItemList'>
+
+            </ul>
+            <hr>
+             <span id='user'></span>
+                <span id='total'></span>
+                <span id='deliver'></span>
+                <span id='time'></span>
+                <br>
+                <span id='phone'></span>
+                <br>
+                <span id='address'></span>
+                <br>
+                
+                
+                <span id='comment'></span>
+                <span id='changeStatus'></span>
+        </div>
+        
+        
+        <hr>
+            <ul id='pendingPurchases'>
+
+            </ul>
+        <hr>
+
+        
+        
+
+
+        <script>
+            
+
+            
+            //This gives the concept of changing images everytime the page is reloaded
+            //This was used instead of css because with this, we can make the page more dynamic 
+            val=Math.floor((Math.random() * 7)+1)
+            document.querySelector('body').style.background = `url('/static/bolemix/img/dbole${val}.jpg')`;
+            document.querySelector('body').style.backgroundSize = '100%';
+            
+
+
+
+
+
+
+
+
+
+            // First, get all the items in a pendingPurchase. since they were stored in variables, replace what changed to what is supposed to be
+            pendingPurchases = JSON.parse('{{ pendingPurchases }}'.replace(/&quot;/g, "'").replace(/&#x27;/g, '"'))
+
+            document.querySelector('#pending').onclick = function(){
+
+                //Hide other set of Purchases eg deliveredPurchase and received Purchase
+
+                //also, set purchaseitemlist to empty so in case user presses button twice, no repition of purchased items will occur
+                
+                document.querySelector('#pendingPurchases').innerHTML = ''
+
+
+                //Remove all items on list
+                document.querySelector('#purchaseItemList').innerHTML = '';
+                document.querySelector('#total').innerHTML = ''
+                document.querySelector('#deliver').innerHTML = ''
+                document.querySelector('#address').innerHTML = ''
+                document.querySelector('#phone').innerHTML = ''
+                document.querySelector('#user').innerHTML = ''
+                document.querySelector('#time').innerHTML = ''
+                document.querySelector('#comment').innerHTML = ''
+                document.querySelector('#user').innerHTML = ''
+                document.querySelector('#changeStatus').innerHTML = ''
+
+                //loop through all pending Purchases, starting from the latest(The one last added to the table)
+                for(i=(pendingPurchases.length-1); i>-1; i--){
+
+                    //Create a list item that will refer to each pending Purchase detail
+                    li = document.createElement('li')
+                    li.innerHTML = `Pending Purchase ${i+1}`
+                    
+
+                    //Create Button that on click will show details of each purchase
+                    button = document.createElement('button')
+                    button.innerHTML = 'details'
+                    button.setAttribute('data-purchase', `${i}`)
+                    
+                    button.onclick = function(){
+
+                        //clear change status
+                        document.querySelector('#changeStatus').innerHTML = ''
+
+                        //Set the div we will be appending the purchase details to, to empty
+                        document.querySelector('#purchaseItemList').innerHTML = ''
+
+                        //Then append the details of this purchase
+                        j = parseInt(this.getAttribute('data-purchase'))
+
+
+                        //Create a  button to change Status of purchased item, example, to received
+                        changeStatus = document.createElement('button');
+                        changeStatus.innerHTML ='Mark as seen'
+                        changeStatus.setAttribute('data-purchase', `${j}`)
+
+                        //On click of change status
+                        changeStatus.onclick = function(){
+                            this.innerHTML = 'pushed for change'
+                        }
+
+
+
+                        //Get details about specific purchase
+                        purchase = pendingPurchases[j]
+
+                        //Get the list of products to append 
+                        products = eval(purchase.products)
+
+                        //Loop through products and append each product to list item
+                        for(k=0; k<products.length; k++){
+
+                            food = products[k].food
+                            price = products[k].price
+                            li = document.createElement('li')
+                            li.innerHTML = `${food} - ${price}`
+
+                            //append details of product
+                            document.querySelector('#purchaseItemList').append(li)
+
+                            //append total price, address and phone number, and deliver to
+                            // eval removes the quotation marks in this case
+                            document.querySelector('#total').innerHTML = `Total: $${purchase.total}`
+                            document.querySelector('#deliver').innerHTML = `Deliver To: ${eval(purchase.deliverTo)}`
+                            document.querySelector('#address').innerHTML = `Delivery Address: ${eval(purchase.address)}`
+                            document.querySelector('#phone').innerHTML = `Contact: ${eval(purchase.phone)}`
+                            document.querySelector('#user').innerHTML = `User: ${purchase.user}`
+                            document.querySelector('#changeStatus').append(changeStatus);
+
+                            document.querySelector('#comment').innerHTML = `Comment: ${purchase.comment}`
+
+
+                            //We are slicing the time string, so as not to include some unwanted characters, that might 
+                            //not be needed here, but is surely needed in uniquely identifying each purchase
+                            document.querySelector('#time').innerHTML = `Time: ${purchase.time.slice(1, -6)}`
+
+
+                        }
+
+                        
+
+
+                        changeStatus.onclick = function(){
+                            this.innerHTML = 'pushed for change'
+
+                            var dataform = new FormData()
+
+                            //Append what will uniquely identify each purchase
+                            dataform.append('user', purchase.user)
+
+                            //Do not use eval on purchase.products, as it will become a list, and only stings can be submitted
+                            dataform.append('products', purchase.products)
+                            dataform.append('total', eval(purchase.total))
+
+                            dataform.append('deliverTo', eval(purchase.deliverTo))
+                            dataform.append('address', eval(purchase.address))
+                            dataform.append('phone', eval(purchase.phone))
+                            dataform.append('statusValue', 'pending')
+                            dataform.append('comment', JSON.stringify(purchase.comment))
+                            dataform.append('time', eval(purchase.time))
+
+                            dataform.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+
+
+                            
+                           document.querySelector('#phone').innerHTML = JSON.stringify(purchase.statusValue)
+                    
+
+                         const request = new XMLHttpRequest()
+
+                           request.open('POST', '{% url "adminDetails" %}')
+                           request.onload = function(){
+                            const data = JSON.parse(request.responseText)
+                               
+                               //On return of request, reload this same page,by then, django must have made updates to the data.
+                                window.location.assign('{% url "adminDetails" %}')
+                                
+                           
+
+                               
+                           }
+                           request.send(dataform)
+
+
+                        }
+
+                    }
+                        //
+
+                    li.append(button)
+                    document.querySelector('#pendingPurchases').append(li)
+
+                }
+            }
+
+
+
+            //Do the same thing for receivedPurchases
+            receivedPurchases = JSON.parse('{{ receivedPurchases }}'.replace(/&quot;/g, "'").replace(/&#x27;/g, '"'))
+
+            document.querySelector('#received').onclick = function(){
+            
+                //removes other types of purchases(pending and successful)
+                document.querySelector('#pendingPurchases').innerHTML = ''
+
+                //Remove all items on list
+                document.querySelector('#purchaseItemList').innerHTML = '';
+                document.querySelector('#total').innerHTML = ''
+                document.querySelector('#deliver').innerHTML = ''
+                document.querySelector('#address').innerHTML = ''
+                document.querySelector('#phone').innerHTML = ''
+                document.querySelector('#time').innerHTML = ''
+                document.querySelector('#comment').innerHTML = ''
+                document.querySelector('#changeStatus').innerHTML = ''
+                document.querySelector('#user').innerHTML = ''
+
+                //loop through all pending Purchases
+                for(i=(receivedPurchases.length-1); i>-1; i--){
+
+                    //Create a list item that will refer to each pending Purchase detail
+                    li = document.createElement('li')
+                    li.innerHTML = `Received Purchase ${i+1}`
+                    
+                      //Create Button that on click will show details of each purchase
+                      button = document.createElement('button')
+                      button.innerHTML = 'details'
+                      button.setAttribute('data-purchase', `${i}`)
+
+
+                      button.onclick = function(){
+
+                            //Set the div we will be appending the purchase details to, to empty
+                            document.querySelector('#purchaseItemList').innerHTML = ''
+                            document.querySelector('#changeStatus').innerHTML = ''
+
+
+                            //Then append the details of this purchase
+                            j = parseInt(this.getAttribute('data-purchase'))
+
+
+                            //
+                             
+                                //Create a  button to change Status of purchased item, example, to received
+                                changeStatus = document.createElement('button');
+                                changeStatus.innerHTML ='Mark as dlivered'
+                                changeStatus.setAttribute('data-purchase', `${j}`)
+
+                                //On click of change status
+                                changeStatus.onclick = function(){
+                                    this.innerHTML = 'pushed to delivered'
+                                }
+                            //
+
+                            //Get details about specific purchase
+                            purchase = receivedPurchases[j]
+
+                            //Get the list of products to append 
+                            products = eval(purchase.products)
+
+                            //Loop through products and append each product to list item
+                            for(k=0; k<products.length; k++){
+
+                                food = products[k].food
+                                price = products[k].price
+                                li = document.createElement('li')
+                                li.innerHTML = `${food} - ${price}`
+
+
+                            //append details of product
+                            document.querySelector('#purchaseItemList').append(li)
+
+                            //append total price, address and phone number, and deliver to
+                            // eval removes the quotation marks in this case
+                            document.querySelector('#total').innerHTML = `Total: $${purchase.total}`
+                            document.querySelector('#user').innerHTML = `User: ${purchase.user}`
+                            document.querySelector('#deliver').innerHTML = `Deliver To: ${eval(purchase.deliverTo)}`
+                            document.querySelector('#address').innerHTML = `Delivery Address: ${eval(purchase.address)}`
+                            document.querySelector('#phone').innerHTML = `Contact: ${eval(purchase.phone)}`
+                            document.querySelector('#changeStatus').append(changeStatus);
+
+                            document.querySelector('#comment').innerHTML = `Comment: ${purchase.comment}`
+
+
+                            //We are slicing the time string, so as not to include some unwanted characters, that might 
+                            //not be needed here, but is surely needed in uniquely identifying each purchase
+                            document.querySelector('#time').innerHTML = `Time: ${purchase.time.slice(1, -6)}`
+
+                        }
+
+
+                        //
+                        changeStatus.onclick = function(){
+                            this.innerHTML = 'pushed to delivery'
+
+                            var dataform = new FormData()
+
+                            //Append what will uniquely identify each purchase
+                            dataform.append('user', purchase.user)
+
+                            //Do not use eval on purchase.products, as it will become a list, and only stings can be submitted
+                            dataform.append('products', purchase.products)
+                            dataform.append('user', purchase.user)
+                            dataform.append('total', eval(purchase.total))
+                            dataform.append('comment', eval(purchase.comment))
+                            dataform.append('time', eval(purchase.time))
+                            dataform.append('deliverTo', eval(purchase.deliverTo))
+                            dataform.append('address', eval(purchase.address))
+                            dataform.append('phone', eval(purchase.phone))
+                            dataform.append('statusValue', 'received')
+
+                            dataform.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+
+
+                            
+                           document.querySelector('#phone').innerHTML = JSON.stringify(purchase.statusValue)
+                 
+                         const request = new XMLHttpRequest()
+
+                           request.open('POST', '{% url "adminDetails" %}')
+                           request.onload = function(){
+                            const data = JSON.parse(request.responseText)
+                               
+                               //On return of request, reload this same page,by then, django must have made updates to the data.
+                                window.location.assign('{% url "adminDetails" %}')
+                                
+                           
+
+                               
+                           }
+                           request.send(dataform)
+
+
+                        }
+                        //
+
+
+                    }
+
+
+
+                    li.append(button)
+                    document.querySelector('#pendingPurchases').append(li)
+                }
+            }
+
+
+
+
+
+             //Do the same thing for deliveredPurchases
+             deliveredPurchases = JSON.parse('{{ deliveredPurchases }}'.replace(/&quot;/g, "'").replace(/&#x27;/g, '"'))
+
+            document.querySelector('#delivered').onclick = function(){
+
+                //removes other types of purchases(pending and successful)
+                document.querySelector('#pendingPurchases').innerHTML = ''
+
+                //Remove all items on list
+                document.querySelector('#purchaseItemList').innerHTML = '';
+                document.querySelector('#total').innerHTML = ''
+                document.querySelector('#deliver').innerHTML = ''
+                document.querySelector('#address').innerHTML = ''
+                document.querySelector('#phone').innerHTML = ''
+                document.querySelector('#time').innerHTML = ''
+                document.querySelector('#comment').innerHTML = ''
+                document.querySelector('#changeStatus').innerHTML = ''
+                document.querySelector('#user').innerHTML = ''
+                
+                //loop through all pending Purchases
+                for(i=(deliveredPurchases.length-1); i>-1; i--){
+
+                    //Create a list item that will refer to each pending Purchase detail
+                    li = document.createElement('li')
+                    li.innerHTML = ` Delivered Purchase ${i+1}`
+                    
+                    //Create Button that on click will show details of each purchase
+                    button = document.createElement('button')
+                    button.innerHTML = 'details'
+                    button.setAttribute('data-purchase', `${i}`)
+
+
+                    button.onclick = function(){
+
+                            //Set the div we will be appending the purchase details to, to empty
+                            document.querySelector('#purchaseItemList').innerHTML = ''
+
+                            //Then append the details of this purchase
+                            j = parseInt(this.getAttribute('data-purchase'))
+
+                            //Get details about specific purchase
+                            purchase = deliveredPurchases[j]
+
+                            //Get the list of products to append 
+                            products = eval(purchase.products)
+
+                            //Loop through products and append each product to list item
+                            for(k=0; k<products.length; k++){
+
+                                food = products[k].food
+                                price = products[k].price
+                                li = document.createElement('li')
+                                li.innerHTML = `${food} - ${price}`
+
+
+                            //append details of product
+                            document.querySelector('#purchaseItemList').append(li)
+
+                            //append total price, address and phone number, and deliver to
+                            // eval removes the quotation marks in this case
+                            document.querySelector('#total').innerHTML = `Total: $${purchase.total}`
+                            document.querySelector('#deliver').innerHTML = `Delivered To: ${eval(purchase.deliverTo)}`
+                            document.querySelector('#address').innerHTML = `Delivery Address: ${eval(purchase.address)}`
+                            document.querySelector('#phone').innerHTML = `Contact: ${eval(purchase.phone)}`
+
+                            document.querySelector('#user').innerHTML = `User: ${purchase.user}`
+                            document.querySelector('#comment').innerHTML = `Comment: ${eval(purchase.comment)}`
+
+
+                            //We are slicing the time string, so as not to include some unwanted characters, that might 
+                            //not be needed here, but is surely needed in uniquely identifying each purchase
+                            document.querySelector('#time').innerHTML = `Time: ${purchase.time.slice(1, -6)}`
+
+                        }
+
+
+                    }
+
+
+
+                    li.append(button)
+                    document.querySelector('#pendingPurchases').append(li)
+                }
+            }
+        
+             
+
+        </script>
+        
+
+    </body>
+</html>

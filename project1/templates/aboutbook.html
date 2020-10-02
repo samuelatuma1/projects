@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+{% block title %}About book{% endblock %}
+
+{% block body %}
+<table>
+    <tr>
+        <th>isbn</th>
+        <th>title</th>
+        <th>author</th>
+        <th>year</th>
+
+    </tr>
+    <tr>
+        <td>{{ book.isbn }}</td>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.year }}</td>
+    </tr>
+</table>
+
+<table>
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Rating</th>
+            <th>Review</th>
+            <th>Date</th>
+            <th>GoodRead Rating</th>
+            <th>Total GoodReadReviews</th>
+        </tr>
+    </thead>
+        
+    <tbody>
+        {% for rev in review %}
+        <tr>
+                <td>{{ rev.user }}</td>
+                <td> {{ rev.rating }} star </td>
+                <td> {{ rev.review }} </td>
+                <td> {{ rev.date }}</td>
+                <td>{{ average_rating }}</td>
+                <td>{{ total_reviews }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br>
+<hr>
+<form action="{{url_for('rate') }}" method='post'>
+    <select name='book_id'>
+         <option value='{{ book.id }}'>{{ book.title }}</option>
+
+         </select>
+         <select name='isbn'>
+            <option value='{{ book.isbn }}'>{{ book.isbn }}</option>
+   
+            </select>
+
+    <select name='rating'>
+        <option value='5'>5 star</option>
+        <option value='4'>4 star</option>
+        <option value='3'>3 star</option>
+        <option value='2'>2 star</option>
+        <option value='1'>1 star</option>
+    </select>
+
+    <input name='review' placeholder="write your review">
+    <button>Submit!</button>
+</form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% block title %}Review book{% endblock %}
+
+{% block body %}
+
+ <p>You are signed in as user id {{user}}</p>
+
+ <form action="{{ url_for('loggedin') }}" method=post>
+     <input type='text' name='search' placeholder='isbn, name, title or year of book'>
+     <button>Submit!</button>
+ </form>
+
+ {{ book.title }}
+
+{% endblock %}

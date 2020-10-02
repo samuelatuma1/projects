@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block title %}Book Page{% endblock %}
+
+{% block body %}
+
+<ul>
+    {% for part in book %}
+    <li><a href='{{ url_for("thebook", id=part.id) }}'>{{ part.isbn }}, {{ part.title }}, {{ part.author }}, {{ part.year }}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
